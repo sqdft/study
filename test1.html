@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok AI 多账号管理中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .instructions {
+            background: rgba(255, 235, 59, 0.1);
+            border-left: 4px solid #FFC107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            color: #5d4037;
+        }
+
+        .instructions h3 {
+            color: #ff8f00;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .warning {
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #c62828;
+        }
+
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .account-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .account-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .account-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .account-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.1);
+            color: #388e3c;
+        }
+
+        .status-backup {
+            background: rgba(255, 152, 0, 0.1);
+            color: #f57c00;
+        }
+
+        .account-info {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .bookmark-section {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .bookmark-label {
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .bookmark-container {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .bookmark-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: grab;
+            border: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .bookmark-button:active {
+            cursor: grabbing;
+        }
+
+        .bookmark-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .bookmark-button.secondary {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        }
+
+        .bookmark-button.secondary:hover {
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .direct-link {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .direct-link:hover {
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .bookmark-help {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .copy-button {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: #cbd5e0;
+        }
+
+        .footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 25px;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .update-info {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .update-date {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .bookmark-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">G</div>
+            <h1>Grok AI 多账号管理中心</h1>
+            <p class="subtitle">专业版多账号管理工具 - 正确拖拽书签到浏览器书签栏</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📖 详细使用说明</h3>
+            <ol>
+                <li><strong>鼠标左键按住</strong>下方的"🔑 一键登录"按钮</li>
+                <li><strong>拖拽到浏览器书签栏</strong>（地址栏下方的书签栏）</li>
+                <li>松开鼠标，书签会自动创建</li>
+                <li>打开新标签页访问 <strong>https://x.ai/grok</strong></li>
+                <li>在x.ai页面上点击刚才创建的书签</li>
+                <li>页面会自动刷新并登录到对应账号</li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ 重要提示：</strong>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li>必须在 x.ai 网站上使用书签才能生效</li>
+                <li>不要直接点击按钮，要拖拽到书签栏</li>
+                <li>如果书签栏不可见，请按 Ctrl+Shift+B 显示</li>
+            </ul>
+        </div>
+
+        <div class="update-info">
+            <p>最后更新时间: <span class="update-date" id="updateTime">2025年1月21日</span></p>
+        </div>
+
+        <div class="account-grid">
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-title">🚀 主账号 #1</div>
+                    <div class="account-status status-active">活跃</div>
+                </div>
+                <div class="account-info">
+                    用户ID: e34e28cb-ea1b-4856-a178-7adca50385a5<br>
+                    语言设置: English<br>
+                    适用于: 日常对话、工作任务
+                </div>
+                <div class="bookmark-section">
+                    <div class="bookmark-label">🎯 请拖拽下面的按钮到书签栏：</div>
+                    <div class="bookmark-container">
+                        <div class="tooltip">
+                            <a href="javascript:(function(){if(window.location.hostname.includes('x.ai')||window.location.hostname.includes('grok.com')){const cookies=['i18nextLng=en; path=/; domain=.x.ai','sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiMTBiZTBiMjEtMGQ0Yi00YTI0LWEyNmEtZWRkNzQzMjIyMmY1In0.4zZvOL-pNTManPBtl-Yi4RgOfqPxKXeTcTGgoVNVb4c; path=/; domain=.x.ai','sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiMTBiZTBiMjEtMGQ0Yi00YTI0LWEyNmEtZWRkNzQzMjIyMmY1In0.4zZvOL-pNTManPBtl-Yi4RgOfqPxKXeTcTGgoVNVb4c; path=/; domain=.x.ai','stblid=186ae93a-b7bb-45e6-a9d3-6de528030574; path=/; domain=.x.ai'];cookies.forEach(c=>document.cookie=c);location.reload();}else{alert('请先访问 https://x.ai/grok 再使用此书签');window.open('https://x.ai/grok','_blank');}})()" 
+                               class="bookmark-button" 
+                               draggable="true"
+                               ondragstart="handleDragStart(event)"
+                               title="拖拽我到书签栏">
+                                🔑 一键登录 - 主账号
+                            </a>
+                            <span class="tooltiptext">用鼠标左键按住拖拽到书签栏</span>
+                        </div>
+                        <div class="bookmark-help">👆 按住鼠标左键拖拽到浏览器书签栏</div>
+                    </div>
+                    <a href="https://x.ai/grok" class="bookmark-button direct-link" target="_blank">🌐 直接访问 Grok</a>
+                </div>
+            </div>
+
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-title">🛡️ 备用账号 #2</div>
+                    <div class="account-status status-backup">备用</div>
+                </div>
+                <div class="account-info">
+                    用户ID: 8b258d68-eb5d-4796-9f79-0050bb108992<br>
+                    语言设置: 中文<br>
+                    适用于: 测试功能、备份访问
+                </div>
+                <div class="bookmark-section">
+                    <div class="bookmark-label">🎯 请拖拽下面的按钮到书签栏：</div>
+                    <div class="bookmark-container">
+                        <div class="tooltip">
+                            <a href="javascript:(function(){if(window.location.hostname.includes('x.ai')||window.location.hostname.includes('grok.com')){const cookies=['i18nextLng=zh; path=/; domain=.x.ai','sso=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiYjg3ODQxYmQtMTdmYy00ZGQ2LWE1NTAtMzNiOGFjYTcxZWIxIn0.gpImC6uG6fSHo_jJR4K1qjntKk6sWyzE-5R4N8cbSLs; path=/; domain=.x.ai','sso-rw=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiYjg3ODQxYmQtMTdmYy00ZGQ2LWE1NTAtMzNiOGFjYTcxZWIxIn0.gpImC6uG6fSHo_jJR4K1qjntKk6sWyzE-5R4N8cbSLs; path=/; domain=.x.ai','stblid=3374fc78-ea5d-40c9-bf9d-0e0670438e35; path=/; domain=.x.ai'];cookies.forEach(c=>document.cookie=c);location.reload();}else{alert('请先访问 https://x.ai/grok 再使用此书签');window.open('https://x.ai/grok','_blank');}})()" 
+                               class="bookmark-button secondary" 
+                               draggable="true"
+                               ondragstart="handleDragStart(event)"
+                               title="拖拽我到书签栏">
+                                🔑 一键登录 - 备用账号
+                            </a>
+                            <span class="tooltiptext">用鼠标左键按住拖拽到书签栏</span>
+                        </div>
+                        <div class="bookmark-help">👆 按住鼠标左键拖拽到浏览器书签栏</div>
+                    </div>
+                    <a href="https://x.ai/grok" class="bookmark-button direct-link" target="_blank">🌐 直接访问 Grok</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🔒 仅限内部用户使用 | 定期更新cookies确保正常访问</p>
+            <p>💡 如遇到登录问题，请联系管理员获取最新版本</p>
+            <p>🌟 适合部署到 GitHub Pages 或其他静态网站托管服务</p>
+        </div>
+    </div>
+
+    <script>
+        // 设置当前更新时间
+        document.getElementById('updateTime').textContent = new Date().toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // 处理拖拽开始事件
+        function handleDragStart(event) {
+            const link = event.target;
+            const bookmarkName = link.textContent.trim();
+            const bookmarkUrl = link.href;
+            
+            // 设置拖拽数据
+            event.dataTransfer.setData('text/plain', bookmarkUrl);
+            event.dataTransfer.setData('text/uri-list', bookmarkUrl);
+            event.dataTransfer.setData('text/html', `<a href="${bookmarkUrl}">${bookmarkName}</a>`);
+            
+            // 显示拖拽提示
+            link.style.opacity = '0.5';
+            
+            console.log('开始拖拽书签:', bookmarkName);
+        }
+
+        // 拖拽结束后恢复样式
+        document.querySelectorAll('a[draggable="true"]').forEach(link => {
+            link.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+            });
+            
+            // 防止意外点击
+            link.addEventListener('click', function(e) {
+                if (!e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    alert('请拖拽此按钮到书签栏，不要直接点击！\n\n操作步骤：\n1. 用鼠标左键按住此按钮\n2. 拖拽到浏览器书签栏\n3. 松开鼠标完成书签创建');
+                }
+            });
+        });
+
+        // 添加键盘提示
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F1') {
+                e.preventDefault();
+                alert('书签使用帮助：\n\n1. 按住鼠标左键拖拽"一键登录"按钮到书签栏\n2. 访问 https://x.ai/grok\n3. 在x.ai页面点击书签栏中的书签\n4. 页面会自动登录\n\n注意：书签只能在x.ai网站上使用！');
+            }
+        });
+
+        // 检查书签栏是否可见
+        function checkBookmarkBar() {
+            const isChrome = /Chrome/.test(navigator.userAgent);
+            const isFirefox = /Firefox/.test(navigator.userAgent);
+            
+            if (isChrome || isFirefox) {
+                console.log('提示：如果看不到书签栏，请按 Ctrl+Shift+B 显示书签栏');
+            }
+        }
+
+        // 页面加载完成后检查
+        window.addEventListener('load', function() {
+            checkBookmarkBar();
+            
+            // 添加使用提示
+            setTimeout(() => {
+                if (!localStorage.getItem('bookmark_tip_shown')) {
+                    alert('👋 欢迎使用Grok多账号管理！\n\n请将"一键登录"按钮拖拽到浏览器书签栏使用。\n\n按F1查看详细帮助。');
+                    localStorage.setItem('bookmark_tip_shown', 'true');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
